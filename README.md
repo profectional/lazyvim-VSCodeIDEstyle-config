@@ -1,5 +1,18 @@
--- VSCode-like keymaps for LazyVim
--- Loaded on VeryLazy event
+---
+
+
+````md
+# VSCode-like keymaps for LazyVim
+
+Loaded on `VeryLazy` event.
+
+This file contains custom keybindings that make LazyVim behave more like VSCode while preserving Vim modal editing.
+
+---
+
+## Lua Keymap Configuration
+
+```lua
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
@@ -26,7 +39,7 @@ map({ "n", "v" }, "P", '"_dP', opts)
 map("i", "<S-Insert>", "<C-R>+", opts)
 map("c", "<S-Insert>", "<C-R>+", opts)
 
--- CTRL-C to copy (works in insert + normal + visual)
+-- CTRL-C to copy
 map({ "i", "n", "v" }, "<C-c>", '"+y', opts)
 
 -- Ctrl-V Normal mode paste
@@ -38,10 +51,10 @@ map("v", "<C-v>", '"_dP', opts)
 -- Ctrl-V Insert mode paste
 map("i", "<C-v>", "<C-R>+", opts)
 
--- CTRL-A to select all (insert + normal + visual)
+-- CTRL-A select all
 map({ "i", "n", "v" }, "<C-a>", "<Esc>ggVG", opts)
 
--- CTRL-R to replace
+-- CTRL-R search/replace
 vim.keymap.set("n", "<C-r>", [[:%s//gc<Left><Left><Left>]], {
   desc = "Search and replace",
 })
@@ -50,20 +63,20 @@ vim.keymap.set("n", "<C-r>", [[:%s//gc<Left><Left><Left>]], {
 -- File operations
 -- =============================
 
--- CTRL-S to save
+-- CTRL-S save
 map({ "i", "n" }, "<C-s>", "<Esc>:w<CR>", opts)
 
 -- =============================
 -- Undo / Redo
 -- =============================
 
--- CTRL-T to open new process
+-- CTRL-T open shell command
 vim.keymap.set({ "i", "n" }, "<C-t>", ":!", { noremap = true })
 
--- CTRL-Z to undo
+-- CTRL-Z undo
 map({ "i", "n" }, "<C-z>", "<Esc>u", opts)
 
--- CTRL-Y to redo
+-- CTRL-Y redo
 map({ "i", "n" }, "<C-y>", "<Esc><C-r>", opts)
 
 -- =========================================
@@ -71,8 +84,8 @@ map({ "i", "n" }, "<C-y>", "<Esc><C-r>", opts)
 -- =========================================
 
 -- Exit insert + select
-vim.keymap.set("i", "<A-v>", "<Esc>v") -- character visual
-vim.keymap.set("i", "<A-V>", "<Esc>V") -- line visual
+vim.keymap.set("i", "<A-v>", "<Esc>v")
+vim.keymap.set("i", "<A-V>", "<Esc>V")
 
 -- QUICK WRAP (VS Code style)
 vim.keymap.set("v", "(", 'c(<C-r>")<Esc>')
@@ -81,23 +94,23 @@ vim.keymap.set("v", "{", 'c{<C-r>"}<Esc>')
 
 -- quotes
 vim.keymap.set("v", '"', 'c"<C-r>""<Esc>')
-vim.keymap.set("v", "'", "c'<C-r>\"<Esc>")
+vim.keymap.set("v", "'", "c'\"<C-r>\"<Esc>")
 
 -- =============================
 -- Search
 -- =============================
 
--- CTRL-F → fuzzy search in current buffer
--- If visual selection exists, use it as default text
 map({ "n", "v" }, "<C-f>", function()
   local builtin = require("telescope.builtin")
   local text = ""
+
   if vim.fn.mode() == "v" or vim.fn.mode() == "V" then
-    vim.cmd('normal! "vy') -- yank visual selection to register v
+    vim.cmd('normal! "vy')
     text = vim.fn.getreg("v")
   end
+
   if text ~= "" then
-    text = text:gsub("([%^%$%(%)%.%[%]%*%+%-%?])", "%%%1") -- escape special chars
+    text = text:gsub("([%^%$%(%)%.%[%]%*%+%-%?])", "%%%1")
     builtin.current_buffer_fuzzy_find({ default_text = text })
   else
     builtin.current_buffer_fuzzy_find()
@@ -105,19 +118,16 @@ map({ "n", "v" }, "<C-f>", function()
 end, opts)
 
 -- =============================
--- Visual mode indentation
+-- Visual indentation
 -- =============================
 
--- Visual mode tab: indent selection
 map("v", "<Tab>", ">gv", opts)
--- Visual mode shift-tab: unindent selection
 map("v", "<S-Tab>", "<gv", opts)
 
 -- =============================
--- Buffer Navigation (like VSCode)
+-- Buffer Navigation (VSCode style)
 -- =============================
 
--- Jump to buffer by index in buffer list
 for i = 1, 6 do
   vim.keymap.set("n", "<C-" .. i .. ">", function()
     local buffers = vim.fn.getbufinfo({ buflisted = 1 })
@@ -126,4 +136,16 @@ for i = 1, 6 do
     end
   end, { noremap = true, silent = true })
 end
+```
+
+---
+
+## Notes
+
+- Uses system clipboard (`+ register`)
+- Overrides some default Vim bindings for VSCode-like behavior
+- Loaded in LazyVim on `VeryLazy`
+- Keeps modal editing intact while adding IDE-like shortcuts
+
+---
 
