@@ -1,7 +1,3 @@
----
-
-
-````md
 # VSCode-like keymaps for LazyVim
 
 Loaded on `VeryLazy` event.
